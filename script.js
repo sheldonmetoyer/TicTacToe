@@ -1,52 +1,93 @@
 const Gameboard = (function (){
     const board = [];
+    let counter = 0;
 
     const createBoard = function() {
         const rows = 3;
         const cols = 3;
 
         for (i = 0; i < rows; i++) {
-            board.push([]);
+            board[i] = [];
             for(j = 0; j < cols; j++){
-                board[i].push(`${i},${j}`);
+                board[i].push(counter);
+                counter++;
             }
         }
     }
 
     const showGameBoard = function() {
-        createBoard();
         console.log(board);
-        return board;
     }
 
-    return {showGameBoard};
+    return {
+        board,
+        showGameBoard,
+        createBoard,
+    };
     
 })();
 
 const createPlayer = (name, marker) => {
     let playerName = name;
     let playerMarker = marker;
+    let spots = [];
 
-    return {playerName, playerMarker}
+    const addSpots = (selection) => {
+        spots.push(selection);
+    }
+
+    const showSpots = () => {
+        console.log(spots);
+    }
+
+    return {
+        playerName, 
+        playerMarker,
+        showSpots,
+        addSpots,
+    }
 }
 
 const GameController = (function (){
     let players = [];
-    let currentPlayerIndex;
+    let currentPlayer;
     let gameOver = false;
 
     const start = () => {
+        Gameboard.createBoard();
+        currentPlayer = 0;
+        gameOver = false;
         players = [
             createPlayer('playerOne', 'x'),
-            createPlayer('playerTwo', 'O')
+            createPlayer('playerTwo', 'o')
         ];
-        currentPlayerIndex = 0;
-        gameOver = false;
-        console.log(players);
+        console.log(players, Gameboard.board);
+    }
+
+    const playerMove = ([row], [selection]) => {
+
+        if(typeof Gameboard.board[row][selection] !== "number") {
+            console.log("invalid move, go again");
+            return
+        }
+        let getNumber = Gameboard.board[row][selection];
+        console.log(getNumber);
+        players[currentPlayer].addSpots(getNumber);
+        players[currentPlayer].showSpots();
+
+        Gameboard.board[row][selection] = players[currentPlayer].playerMarker;
+        
+        currentPlayer = currentPlayer === 0 ? 1 : 0;
+        
+        
         Gameboard.showGameBoard();
     }
 
-    return {start}
+
+    return {
+        start,
+        playerMove,
+    }
 })();
 
 
